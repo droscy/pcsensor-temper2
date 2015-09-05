@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Plugin to monitor temperature with TEMPer devices from RDing PCcsensors
+# 
+# Copyright (c) 2011 EanderAlx
+# License CC BY-NC-SA 4.0 http://creativecommons.org/licenses/by-nc-sa/4.0/
+# Downloaded from https://www.eanderalx.org/linux/hid_temper_pc_sensor
+# 
+# To install this script simply symlink it in /etc/munin/plugins/ folder.
+# You can configure to print in Celsius or Fahrenheit setting env.tscale
+# to 'c' or 'f' (default to Celsius)
+#
+# Magic markers (optional - only used by munin-config and some installation scripts):
+#%# family=contrib
+
+MODEL="TEMPer2"
+
+if [ "$1" = "config" ]; then
+  echo "graph_title ${MODEL} temperatures"
+  echo "graph_args --base 1000"
+
+  if [ "${tscale}" = "f" ]; then
+    echo "graph_vlabel Fahrenheit"
+  else
+    echo "graph_vlabel Celsius"
+  fi
+
+  echo "graph_category sensors"
+  echo "graph_info This graph shows temperature data read from ${MODEL}"
+  echo "temp1.label Internal"
+  echo "temp1.type GAUGE"
+  echo "temp1.info Internal temperature"
+  echo "temp2.label External"
+  echo "temp2.type GAUGE"
+  echo "temp2.info External temperature"
+  exit 0
+fi
+
+TEMPER=$(/usr/local/bin/pcsensor -s -${tscale:-c} | cut -d \; -f 3,4)
+echo -e "temp1.value ${TEMPER%;*}"
+echo -e "temp2.value ${TEMPER##*;}"
+
+exit 0

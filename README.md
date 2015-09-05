@@ -8,7 +8,7 @@ TEMPer usb devices from RDing Tech [www.pcsensor.com](http://www.pcsensor.com/).
 Just execute `make` in the root folder to compile `pcsensor` program.
 
 #### Copyright Notice
-pcsensor.c by Juan Carlos Perez (c) 2011 (cray@isp-sl.com)<br>
+pcsensor.c by Juan Carlos Perez (c) 2011 (cray@isp-sl.com)
 based on Temper.c by Robert Kavaler (c) 2009 (relavak.com)
 
 All rights reserved.

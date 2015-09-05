@@ -61,7 +61,7 @@ const static char uIni2[] = { 0x01, 0x86, 0xff, 0x01, 0x00, 0x00, 0x00, 0x00 };
 static int bsalir=1;
 static int debug=0;
 static int seconds=5;
-static int tscale=0; // temperature scale: celsius (1) or fahrenheit (2)
+static int degrees=0; // temperature scale: celsius (1), fahrenheit (2), both (0)
 static int mrtg=0;
 static int calibration=0;
 static int csv=0; // output in csv if set to 1
@@ -327,10 +327,10 @@ int main( int argc, char **argv) {
          debug = 1;
          break;
        case 'c':
-         tscale=1; //Celsius
+         degrees=1; //Celsius
          break;
        case 'f':
-         tscale=2; //Fahrenheit
+         degrees=2; //Fahrenheit
          break;
        case 'm':
          mrtg=1;
@@ -421,7 +421,7 @@ int main( int argc, char **argv) {
            local = localtime(&t);
 
            if (mrtg) {
-              if (tscale==2) {
+              if (degrees==2) {
                   printf("%.2f\n", (9.0 / 5.0 * tempInC + 32.0));
                   printf("%.2f\n", (9.0 / 5.0 * tempOutC + 32.0));
               } else {
@@ -442,8 +442,8 @@ int main( int argc, char **argv) {
                           local->tm_hour,
                           local->tm_min,
                           local->tm_sec,
-                          (tscale==2 ? (9.0 / 5.0 * tempInC + 32.0) : tempInC),
-                          (tscale==2 ? (9.0 / 5.0 * tempOutC + 32.0) : tempOutC));
+                          (degrees==2 ? (9.0 / 5.0 * tempInC + 32.0) : tempInC),
+                          (degrees==2 ? (9.0 / 5.0 * tempOutC + 32.0) : tempOutC));
            } else {
               printf("%04d-%02d-%02d %02d:%02d:%02d\n",
                           local->tm_year +1900,
@@ -453,10 +453,10 @@ int main( int argc, char **argv) {
                           local->tm_min,
                           local->tm_sec);
 
-              if (tscale==2) {
+              if (degrees==2) {
                   printf("Temperature (internal) %.2fF\n", (9.0 / 5.0 * tempInC + 32.0));
                   printf("Temperature (external) %.2fF\n", (9.0 / 5.0 * tempOutC + 32.0));
-              } else if (tscale==1) {
+              } else if (degrees==1) {
                   printf("Temperature (internal) %.2fC\n", tempInC);
                   printf("Temperature (external) %.2fC\n", tempOutC);
               } else {

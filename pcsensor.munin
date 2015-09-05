@@ -7,8 +7,13 @@
 # Downloaded from https://www.eanderalx.org/linux/hid_temper_pc_sensor
 # 
 # To install this script simply symlink it in /etc/munin/plugins/ folder.
-# You can configure to print in Celsius or Fahrenheit setting env.tscale
-# to 'c' or 'f' (default to Celsius)
+#
+# These are the variables that can be set in Munin to configure this plugin:
+#   - env.degrees <c|f> for Celsius or Fahrenheit degrees
+#   - env.t_int_warning for internal temperature warning value
+#   - env.t_int_critical for internal temperature critical value
+#   - env.t_ext_warning for external temperature warning value
+#   - env.t_ext_critical for external temperature critical value
 #
 # Magic markers (optional - only used by munin-config and some installation scripts):
 #%# family=contrib
@@ -16,28 +21,35 @@
 MODEL="TEMPer2"
 
 if [ "$1" = "config" ]; then
-  echo "graph_title ${MODEL} temperatures"
+  echo "graph_title ${MODEL} temperature"
   echo "graph_args --base 1000"
 
-  if [ "${tscale}" = "f" ]; then
-    echo "graph_vlabel Fahrenheit"
+  if [ "${degrees}" = "f" ]; then
+    echo "graph_vlabel Degrees Fahrenheit"
   else
-    echo "graph_vlabel Celsius"
+    echo "graph_vlabel Degrees Celsius"
   fi
 
   echo "graph_category sensors"
-  echo "graph_info This graph shows temperature data read from ${MODEL}"
-  echo "temp1.label Internal"
-  echo "temp1.type GAUGE"
-  echo "temp1.info Internal temperature"
-  echo "temp2.label External"
-  echo "temp2.type GAUGE"
-  echo "temp2.info External temperature"
+  echo "graph_info This graph shows temperatures read from ${MODEL} sensor"
+
+  echo "t_int.info Internal temperature"
+  echo "t_int.label Internal"
+  echo "t_int.type GAUGE"
+  [ ! -z ${t_int_warning} ] && echo "t_int.warning ${t_int_warning}"
+  [ ! -z ${t_int_critical} ] && echo "t_int.critical ${t_int_critical}"
+
+  echo "t_ext.info External temperature"
+  echo "t_ext.label External"
+  echo "t_ext.type GAUGE"
+  [ ! -z ${t_ext_warning} ] && echo "t_ext.warning ${t_ext_warning}"
+  [ ! -z ${t_ext_critical} ] && echo "t_ext.critical ${t_ext_critical}"
+
   exit 0
 fi
 
-TEMPER=$(/usr/local/bin/pcsensor -s -${tscale:-c} | cut -d \; -f 3,4)
-echo -e "temp1.value ${TEMPER%;*}"
-echo -e "temp2.value ${TEMPER##*;}"
+TEMPER=$(/usr/local/bin/pcsensor -s -${degrees:-c} | cut -d \; -f 3,4)
+echo -e "t_int.value ${TEMPER%;*}"
+echo -e "t_ext.value ${TEMPER##*;}"
 
 exit 0

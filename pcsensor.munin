@@ -49,6 +49,12 @@ if [ "$1" = "config" ]; then
 fi
 
 TEMPER=$(/usr/local/bin/pcsensor -s -${degrees:-c} | cut -d \; -f 3,4)
+
+if [ -z ${TEMPER} ]; then
+  echo 'Cannot get data from pcsensor or pcsensor not present' 1>&2
+  exit 1
+fi
+
 echo -e "t_int.value ${TEMPER%;*}"
 echo -e "t_ext.value ${TEMPER##*;}"
 

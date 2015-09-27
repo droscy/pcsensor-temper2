@@ -38,7 +38,7 @@
 #include <signal.h>
 
 
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 #define VENDOR_ID  0x0c45
 #define PRODUCT_ID 0x7401
@@ -63,7 +63,7 @@ static int debug=0;
 static int seconds=5;
 static int degrees=0; // temperature scale: celsius (1), fahrenheit (2), both (0)
 static int mrtg=0;
-static int calibration=0;
+static float calibration=0;
 static int csv=0; // output in csv if set to 1
 
 
@@ -265,18 +265,16 @@ void interrupt_read_temperatura(usb_dev_handle *dev, float *tempInC, float *temp
 
 
     if(debug) {
-      for (i=0;i<reqIntLen; i++) printf("%02x ",answer[i]  & 0xFF);
+      for (i=0;i<reqIntLen; i++) printf("%02x ",answer[i] & 0xFF);
 
       printf("\n");
     }
 
     temperature = (answer[3] & 0xFF) + ((signed char)answer[2] << 8);
-    temperature += calibration;
-    *tempInC = temperature * (125.0 / 32000.0);
+    *tempInC = (temperature * (125.0 / 32000.0)) + calibration;
 
     temperature = (answer[5] & 0xFF) + ((signed char)answer[4] << 8);
-    temperature += calibration;
-    *tempOutC = temperature * (125.0 / 32000.0);
+    *tempOutC = (temperature * (125.0 / 32000.0)) + calibration;
 
 }
 
@@ -320,7 +318,7 @@ int main( int argc, char **argv) {
      struct tm *local;
      time_t t;
 
-     while ((c = getopt (argc, argv, "smfcvhl::a:")) != -1)
+     while ((c = getopt (argc, argv, "vcfmsl::a:h?")) != -1)
      switch (c)
        {
        case 'v':
@@ -353,7 +351,7 @@ int main( int argc, char **argv) {
            break;
          }
        case 'a':
-         if (!sscanf(optarg,"%i",&calibration)==1) {
+         if (!sscanf(optarg,"%f",&calibration)==1) {
              fprintf (stderr, "Error: '%s' is not numeric.\n", optarg);
              exit(EXIT_FAILURE);
          } else {
@@ -368,7 +366,7 @@ int main( int argc, char **argv) {
          printf("    -l[n] loop every 'n' seconds, default value is 5s\n");
          printf("    -c output only in Celsius\n");
          printf("    -f output only in Fahrenheit\n");
-         printf("    -a[n] increase or decrease temperature in 'n' degrees for device calibration\n");
+         printf("    -a [n] change output temperature by 'n' Celsius degrees for device calibration (n is float)\n");
          printf("    -m output for mrtg integration\n");
          printf("    -s output in CSV format (DATE;TIME;INT;EXT)\n");
 

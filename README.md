@@ -30,7 +30,8 @@ All rights reserved.
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #### Changelog
-* 2011-08-30: bugfix to support negative temperatures (thanks to EdorFaus)
+* 2011-08-30 (EdorFaus): bugfix to support negative temperatures
 * 2012-09-13 (Peter Farsinsen): output both the temperature from the internal as well as the external sensor
 * 2015-08-19 (Peter Farsinsen): fixed `-m` showing only internal temperature, now shows both
 * 2015-09-05 (Simone Rossetto): added `-s` option to print output in CSV (and machine-readable) format
+* 2015-09-27 (Simone Rossetto): fixed calibration-unit (`-a` option) now it is in Celsius degrees
